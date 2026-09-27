@@ -26,6 +26,12 @@ import os
 from time import sleep
 
 
+_EWRAM_START = 0x02000000
+_EWRAM_END = 0x0203FFFF
+_IWRAM_START = 0x03000000
+_IWRAM_END = 0x03007FFF
+
+
 class PyBoyAdvance:
     def __init__(
         self,
@@ -129,6 +135,38 @@ class PyBoyAdvance:
 
     def release_key(self, key: Key):
         self.keypad.release_key(key)
+
+    def peek_u8(self, address: int) -> int:
+        """Read one EWRAM or IWRAM byte without advancing emulation time."""
+
+        return self._peek(address, 1)
+
+    def peek_u16(self, address: int) -> int:
+        """Read one little-endian EWRAM or IWRAM 16-bit value without timing."""
+
+        return self._peek(address, 2)
+
+    def peek_u32(self, address: int) -> int:
+        """Read one little-endian EWRAM or IWRAM 32-bit value without timing."""
+
+        return self._peek(address, 4)
+
+    def _peek(self, address: int, width: int) -> int:
+        if isinstance(address, bool) or not isinstance(address, int):
+            raise TypeError("address must be an integer")
+
+        if _EWRAM_START <= address and address + width - 1 <= _EWRAM_END:
+            backing = self.memory.ewram
+            offset = address - _EWRAM_START
+        elif _IWRAM_START <= address and address + width - 1 <= _IWRAM_END:
+            backing = self.memory.iwram
+            offset = address - _IWRAM_START
+        else:
+            raise ValueError(
+                "peek address and width must lie wholly in EWRAM or IWRAM"
+            )
+
+        return sum(backing[offset + index] << (index * 8) for index in range(width))
 
     def set_emulation_speed(self, speed: float):
         if speed < 0:
