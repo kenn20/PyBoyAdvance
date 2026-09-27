@@ -136,6 +136,12 @@ class PyBoyAdvance:
     def release_key(self, key: Key):
         self.keypad.release_key(key)
 
+    @property
+    def emulation_cycles(self) -> int:
+        """Return the current emulated cycle count without exposing the scheduler."""
+
+        return self.scheduler.cycles
+
     def peek_u8(self, address: int) -> int:
         """Read one EWRAM or IWRAM byte without advancing emulation time."""
 
