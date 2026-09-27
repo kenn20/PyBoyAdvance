@@ -30,7 +30,7 @@ def test_peek_reads_ewram_and_iwram_without_advancing_scheduler(emulator: PyBoyA
     assert emulator.peek_u16(EWRAM_START) == 0x5678
     assert emulator.peek_u32(EWRAM_START) == 0x12345678
     assert emulator.peek_u32(IWRAM_START) == 0x89ABCDEF
-    assert emulator.emulation_cycles == before
+    assert emulator.timing_checkpoint() == before
     assert emulator.scheduler.cycles == before
 
 

@@ -136,9 +136,8 @@ class PyBoyAdvance:
     def release_key(self, key: Key):
         self.keypad.release_key(key)
 
-    @property
-    def emulation_cycles(self) -> int:
-        """Return the current emulated cycle count without exposing the scheduler."""
+    def timing_checkpoint(self) -> int:
+        """Return emulated cycles without exposing the scheduler object."""
 
         return self.scheduler.cycles
 
